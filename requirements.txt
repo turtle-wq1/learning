@@ -1,2 +1,2 @@
 streamlit
-st-gheets-connection
+pandas
