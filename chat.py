@@ -872,19 +872,20 @@ with st.sidebar:
             if new_side != st.session_state.side_chat:
                 st.session_state.side_chat = new_side; st.rerun()
 
-    # ── DM / channel nav (chat tab only) ─────────────────────────────────────
+# ── DM / channel nav (chat tab only) ─────────────────────────────────────
     if st.session_state.active_tab == "chat":
         if st.button("# global", use_container_width=True, key="global_btn"):
-            st.session_state.active_dm = None; st.rerun()
+            st.session_state.active_dm = None
+            st.empty() # Clear the screen buffer
+            st.rerun()
+            
         st.markdown('<div class="section-label">🟢 Online Now</div>', unsafe_allow_html=True)
         others = [u for u in online_users if u != me]
-        if not others:
-            st.markdown('<div style="color:#6b7080;font-size:.82rem;padding-left:4px;">No one else online</div>',
-                        unsafe_allow_html=True)
-        else:
-            for user in others:
-                if st.button(f"💬 {user}", key=f"dm_{user}", use_container_width=True):
-                    st.session_state.active_dm = user; st.rerun()
+        for user in others:
+            if st.button(f"💬 {user}", key=f"dm_{user}", use_container_width=True):
+                st.session_state.active_dm = user
+                st.empty() # Clear the screen buffer
+                st.rerun()
 
     st.markdown("---")
 
@@ -914,63 +915,57 @@ with st.sidebar:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CONTENT ROUTING
+# CONTENT ROUTING (DISAPPEARING PAGES FIX)
 # ══════════════════════════════════════════════════════════════════════════════
-if st.session_state.active_tab == "game":
-    show_game = st.session_state.show_game
-    show_chat = st.session_state.show_chat
-    side_chat = st.session_state.side_chat
+# Create a single placeholder to ensure only one "page" exists at a time
+container = st.empty()
 
-    if show_game and show_chat and side_chat:
-        # 50/50 split: game left, chat right
-        # Hide fullscreen expand button so scrolling in split mode doesn't show a full game
-        st.markdown("""<style>
-button[title="View fullscreen"],[data-testid="StyledFullScreenButton"]{display:none!important;}
-</style>""", unsafe_allow_html=True)
-        game_col, chat_col = st.columns(2)
-        with game_col:
+with container.container():
+    if st.session_state.active_tab == "game":
+        show_game = st.session_state.show_game
+        show_chat = st.session_state.show_chat
+        side_chat = st.session_state.side_chat
+
+        if show_game and show_chat and side_chat:
+            # 50/50 split: game left, chat right
+            st.markdown("""<style>button[title="View fullscreen"],[data-testid="StyledFullScreenButton"]{display:none!important;}</style>""", unsafe_allow_html=True)
+            game_col, chat_col = st.columns(2)
+            with game_col:
+                render_land_game(me)
+            with chat_col:
+                render_chat_panel(me)
+
+        elif show_game and show_chat and not side_chat:
             render_land_game(me)
-        with chat_col:
+            with st.expander("💬 Chat", expanded=False):
+                render_chat_panel(me)
+
+        elif show_game:
+            render_land_game(me)
+
+        elif show_chat:
             render_chat_panel(me)
 
-    elif show_game and show_chat and not side_chat:
-        # Game full width, chat collapsed below
-        render_land_game(me)
-        with st.expander("💬 Chat", expanded=False):
-            render_chat_panel(me)
-
-    elif show_game:
-        render_land_game(me)
-
-    elif show_chat:
-        render_chat_panel(me)
+        else:
+            st.markdown('<div style="text-align:center;color:#6b7080;padding:4rem;font-family:Space Mono,monospace;">Both panels hidden.</div>', unsafe_allow_html=True)
 
     else:
-        st.markdown('<div style="text-align:center;color:#6b7080;padding:4rem;'
-                    'font-family:Space Mono,monospace;">Both panels hidden —<br>'
-                    'use the sidebar toggles to show them.</div>', unsafe_allow_html=True)
+        # ── Pure chat tab ─────────────────────────────────────────────────────────
+        active_dm = st.session_state.active_dm
+        if active_dm:
+            st.markdown(f'<div class="chat-header"><span class="chat-dm">⇄ Direct Message</span> · {active_dm}</div>', unsafe_allow_html=True)
+            messages = get_dm_messages(me, active_dm)
+        else:
+            st.markdown('<div class="chat-header"><span class="chat-channel">#</span> global</div>', unsafe_allow_html=True)
+            messages = get_global_messages()
+            
+        render_messages(messages, me)
+        
+        placeholder_text = f"Message {active_dm}..." if active_dm else "Message #global..."
+        if prompt := st.chat_input(placeholder_text):
+            send_message(me, prompt, recipient=active_dm if active_dm else None)
+            st.rerun()
 
-    # Poll every 3s for new messages / income ticks (was 0.5s — caused lag/flash)
-    time.sleep(3)
-    st.rerun()
-
-else:
-    # ── Pure chat tab ─────────────────────────────────────────────────────────
-    active_dm = st.session_state.active_dm
-    if active_dm:
-        st.markdown(f'<div class="chat-header"><span class="chat-dm">⇄ Direct Message</span> · {active_dm}</div>',
-                    unsafe_allow_html=True)
-        messages = get_dm_messages(me, active_dm)
-    else:
-        st.markdown('<div class="chat-header"><span class="chat-channel">#</span> global</div>',
-                    unsafe_allow_html=True)
-        messages = get_global_messages()
-    render_messages(messages, me)
-    placeholder_text = f"Message {active_dm}..." if active_dm else "Message #global..."
-    if prompt := st.chat_input(placeholder_text):
-        send_message(me, prompt, recipient=active_dm if active_dm else None)
-        st.rerun()
-
-    # Poll every 3s for new messages (was 0.5s — caused lag/flash)
-    time.sleep(3)
-    st.rerun()
+# Reduced sleep to 1s to make "disappearing" feel instant while reducing flash
+time.sleep(1)
+st.rerun()
