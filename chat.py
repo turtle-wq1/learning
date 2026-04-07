@@ -180,7 +180,7 @@ div[data-testid="stHorizontalBlock"] button[kind="secondary"].game-cell {{
 
 # ══════════════════════════════════════════════════════════════════════════════
 # DATABASE
-# ══════════════════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════
 def get_conn():
     return sqlite3.connect(DB, check_same_thread=False)
 
@@ -850,32 +850,22 @@ with st.sidebar:
     if st.button("💬 Chat", use_container_width=True, key="nav_chat"):
         st.session_state.active_tab = "chat"
         st.session_state.active_dm = None
-        st.rerun()
     if st.button("🌍 Land Game", use_container_width=True, key="nav_game"):
         st.session_state.active_tab = "game"
-        st.rerun()
 
     # ── Game view-options (only when on game tab) ─────────────────────────────
     if st.session_state.active_tab == "game":
         st.markdown('<div class="section-label">👁️ View Options</div>', unsafe_allow_html=True)
 
-        new_show_game = st.toggle("Show Game Board", value=st.session_state.show_game, key="tog_game")
-        if new_show_game != st.session_state.show_game:
-            st.session_state.show_game = new_show_game; st.rerun()
-
-        new_show_chat = st.toggle("Show Chat Panel", value=st.session_state.show_chat, key="tog_chat")
-        if new_show_chat != st.session_state.show_chat:
-            st.session_state.show_chat = new_show_chat; st.rerun()
-
-        if st.session_state.show_chat and st.session_state.show_game:
-            new_side = st.toggle("Chat = half screen", value=st.session_state.side_chat, key="tog_side")
-            if new_side != st.session_state.side_chat:
-                st.session_state.side_chat = new_side; st.rerun()
+        st.session_state.show_game = st.toggle("Show Game Board", value=st.session_state.show_game, key="tog_game")
+        st.session_state.show_chat = st.toggle("Show Chat Panel", value=st.session_state.show_chat, key="tog_chat")
+        if st.session_state.show_game and st.session_state.show_chat:
+            st.session_state.side_chat = st.toggle("Chat = half screen", value=st.session_state.side_chat, key="tog_side")
 
     # ── DM / channel nav (chat tab only) ─────────────────────────────────────
     if st.session_state.active_tab == "chat":
         if st.button("# global", use_container_width=True, key="global_btn"):
-            st.session_state.active_dm = None; st.rerun()
+            st.session_state.active_dm = None
         st.markdown('<div class="section-label">🟢 Online Now</div>', unsafe_allow_html=True)
         others = [u for u in online_users if u != me]
         if not others:
@@ -884,7 +874,7 @@ with st.sidebar:
         else:
             for user in others:
                 if st.button(f"💬 {user}", key=f"dm_{user}", use_container_width=True):
-                    st.session_state.active_dm = user; st.rerun()
+                    st.session_state.active_dm = user
 
     st.markdown("---")
 
