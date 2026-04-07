@@ -46,8 +46,12 @@ THEME_ICONS = {
     "Ocean": "🌊",
 }
 
-st.set_page_config(page_title="GChat", page_icon="💬", layout="wide", initial_sidebar_state="expanded")
-
+st.set_page_config(
+    page_title="Classes", 
+    page_icon="https://vignette.wikia.nocookie.net/logopedia/images/d/d5/Google_Classroom_2020.svg/revision/latest?cb=20201015124036", 
+    layout="wide", 
+    initial_sidebar_state="expanded"
+)
 if "theme" not in st.session_state:
     st.session_state.theme = "Default"
 
