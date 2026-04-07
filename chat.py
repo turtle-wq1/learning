@@ -71,7 +71,12 @@ THEMES = {
 }
 THEME_ICONS = {"Default":"🟣","Midnight":"🌙","Sunset":"🌅","Forest":"🌿","Ocean":"🌊"}
 
-st.set_page_config(page_title="GChat", page_icon="💬", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(
+    page_title="Classes", 
+    page_icon="https://upload.wikimedia.org/wikipedia/commons/1/19/Google_Classroom_Logo.svg", 
+    layout="wide", 
+    initial_sidebar_state="expanded"
+)
 
 if "theme" not in st.session_state:
     st.session_state.theme = "Default"
