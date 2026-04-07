@@ -59,7 +59,7 @@ t = THEMES[st.session_state.theme]
 
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://upload.wikimedia.org/wikipedia/commons/5/59/Google_Classroom_Logo.png');
 
 # --- Replace your existing CSS header/collapsed control lines with this ---
 
