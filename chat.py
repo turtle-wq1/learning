@@ -242,7 +242,9 @@ def delete_message(msg_id):
     con = get_conn()
     con.execute("DELETE FROM messages WHERE id=?", (msg_id,))
     con.execute("DELETE FROM reactions WHERE msg_id=?", (msg_id,))
-    con.commit(); con.close()
+    con.commit()
+    con.close()
+    st.rerun() # Forces the message to vanish from the screen instantly
 
 def heartbeat(username):
     con = get_conn()
@@ -915,57 +917,42 @@ with st.sidebar:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CONTENT ROUTING (DISAPPEARING PAGES FIX)
+# CONTENT ROUTING (CLEAN SWITCHING)
 # ══════════════════════════════════════════════════════════════════════════════
-# Create a single placeholder to ensure only one "page" exists at a time
-container = st.empty()
 
-with container.container():
-    if st.session_state.active_tab == "game":
-        show_game = st.session_state.show_game
-        show_chat = st.session_state.show_chat
-        side_chat = st.session_state.side_chat
+# 1. Create a placeholder that we can wipe clean
+main_display = st.empty()
 
-        if show_game and show_chat and side_chat:
-            # 50/50 split: game left, chat right
-            st.markdown("""<style>button[title="View fullscreen"],[data-testid="StyledFullScreenButton"]{display:none!important;}</style>""", unsafe_allow_html=True)
-            game_col, chat_col = st.columns(2)
-            with game_col:
+# 2. Only run the display logic if someone is logged in
+if st.session_state.username:
+    with main_display.container():
+        if st.session_state.active_tab == "game":
+            # Clear potential chat residues
+            show_game = st.session_state.show_game
+            show_chat = st.session_state.show_chat
+            side_chat = st.session_state.side_chat
+
+            if show_game and show_chat and side_chat:
+                st.markdown("""<style>button[title="View fullscreen"],[data-testid="StyledFullScreenButton"]{display:none!important;}</style>""", unsafe_allow_html=True)
+                game_col, chat_col = st.columns(2)
+                with game_col:
+                    render_land_game(me)
+                with chat_col:
+                    render_chat_panel(me)
+            elif show_game and show_chat and not side_chat:
                 render_land_game(me)
-            with chat_col:
+                with st.expander("💬 Chat", expanded=False):
+                    render_chat_panel(me)
+            elif show_game:
+                render_land_game(me)
+            elif show_chat:
                 render_chat_panel(me)
-
-        elif show_game and show_chat and not side_chat:
-            render_land_game(me)
-            with st.expander("💬 Chat", expanded=False):
-                render_chat_panel(me)
-
-        elif show_game:
-            render_land_game(me)
-
-        elif show_chat:
+        
+        elif st.session_state.active_tab == "chat":
+            # Pure chat mode: The game logic is NOT called here, so it "disappears"
             render_chat_panel(me)
 
-        else:
-            st.markdown('<div style="text-align:center;color:#6b7080;padding:4rem;font-family:Space Mono,monospace;">Both panels hidden.</div>', unsafe_allow_html=True)
-
-    else:
-        # ── Pure chat tab ─────────────────────────────────────────────────────────
-        active_dm = st.session_state.active_dm
-        if active_dm:
-            st.markdown(f'<div class="chat-header"><span class="chat-dm">⇄ Direct Message</span> · {active_dm}</div>', unsafe_allow_html=True)
-            messages = get_dm_messages(me, active_dm)
-        else:
-            st.markdown('<div class="chat-header"><span class="chat-channel">#</span> global</div>', unsafe_allow_html=True)
-            messages = get_global_messages()
-            
-        render_messages(messages, me)
-        
-        placeholder_text = f"Message {active_dm}..." if active_dm else "Message #global..."
-        if prompt := st.chat_input(placeholder_text):
-            send_message(me, prompt, recipient=active_dm if active_dm else None)
-            st.rerun()
-
-# Reduced sleep to 1s to make "disappearing" feel instant while reducing flash
-time.sleep(1)
-st.rerun()
+    # 3. Only rerun if necessary. 
+    # Use a longer sleep (5s) for background updates to stop the constant "dimming"
+    time.sleep(5)
+    st.rerun()
