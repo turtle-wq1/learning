@@ -48,7 +48,7 @@ THEME_ICONS = {
 
 st.set_page_config(
     page_title="Classes", 
-    page_icon="https://vignette.wikia.nocookie.net/logopedia/images/d/d5/Google_Classroom_2020.svg/revision/latest?cb=20201015124036", 
+    page_icon="https://upload.wikimedia.org/wikipedia/commons/1/19/Google_Classroom_Logo.svg", 
     layout="wide", 
     initial_sidebar_state="expanded"
 )
