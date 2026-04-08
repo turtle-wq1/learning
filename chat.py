@@ -412,11 +412,11 @@ def get_cash(username):
     con = get_conn()
     row = con.execute("SELECT cash FROM player_cash WHERE username=?", (username,)).fetchone()
     con.close()
-    current_cash = row[0] if row else STARTING_CASH
-    # Store in session state so the UI updates instantly
-    st.session_state.my_cash = current_cash
-    return current_cash
-
+    val = row[0] if row else STARTING_CASH
+    # This is the "Live Link" - it saves the value to session state
+    st.session_state.my_cash = val
+    return val
+    
 def add_cash(username, amount):
     con = get_conn()
     con.execute("INSERT INTO player_cash(username,cash,last_income_tick) VALUES(?,?,?) "
