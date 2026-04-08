@@ -666,7 +666,7 @@ def render_land_game(me):
 
                 if can_click:
                    label = f"${cost}"
-                    tip = f"Buy: ${cost} | Earns +${inc}/tick"
+                   tip = f"Buy: ${cost} | Earns +${inc}/tick"
                     if affordable:
                         if cols_w[col].button(label, key=f"cell_{cell_id}", help=tip,
                                               use_container_width=True):
