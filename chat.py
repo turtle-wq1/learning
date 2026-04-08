@@ -2,7 +2,6 @@ import streamlit as st
 import sqlite3
 import time
 import math
-import st_autorefresh
 
 DB = "gchat.db"
 
@@ -13,11 +12,11 @@ GRID_COLS = GRID_SIZE
 TOTAL_CELLS = GRID_ROWS * GRID_COLS
 
 # Income tick: every N seconds players collect rent from their cells
-INCOME_INTERVAL = 3
+INCOME_INTERVAL = 30
 # Leader cash bonus every tick
-LEADER_BONUS = 10
+LEADER_BONUS = 15
 # Starting cash
-STARTING_CASH = 200
+STARTING_CASH = 100
 # Vote-to-reset threshold
 RESET_VOTE_THRESHOLD = 0.75
 
@@ -29,7 +28,7 @@ def cell_cost(row, col):
     dist = math.sqrt((col - cx) ** 2 + (row - cy) ** 2)
     max_dist = math.sqrt(cx ** 2 + cy ** 2)
     norm = dist / max_dist          # 1 at corner, 0 at centre
-    return max(5, round((1 - norm) * 75 + 5) * 10)
+    return max(5, round((1 - norm) * 75 + 5))
 
 def cell_income(row, col):
     """Income per tick ~10% of cost, min $1."""
@@ -991,12 +990,3 @@ if "last_refresh" not in st.session_state:
 if time.time() - st.session_state.last_refresh > 3:
     st.session_state.last_refresh = time.time()
     st.rerun()
-
-from streamlit_autorefresh import st_autorefresh
-
-# Auto-refresh every INCOME_INTERVAL seconds (in milliseconds)
-st_autorefresh(interval=INCOME_INTERVAL*1000, key="income_tick")
-
-earned = collect_income(me, board)
-if earned > 0:
-    st.toast(f"💰 +${earned} income collected!", icon="💰")
