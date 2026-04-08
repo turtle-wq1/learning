@@ -673,7 +673,7 @@ def render_land_game(me):
                             if deduct_cash(me, cost):
                                 claim_cell(cell_id, me, my_color)
                                 action_taken = True
-                else:
+           else:
                         # Can't afford — show greyed
                         cols_w[col].markdown(
                             f'<div style="background:#1c1c1c;color:#444;border-radius:6px;'
@@ -681,16 +681,16 @@ def render_land_game(me):
                             f'font-family:monospace;min-height:26px;line-height:1.3;'
                             f'border:1px dashed #333;">💸<br>${cost}</div>',
                             unsafe_allow_html=True)
-                else:
-                    # Unreachable unclaimed
-                    opacity = "0.30" if not edge and not owned_any else "0.45"
-                    cols_w[col].markdown(
-                        f'<div style="background:{bg};opacity:{opacity};color:#fff;'
-                        f'border-radius:6px;text-align:center;padding:6px 2px;'
-                        f'font-size:.6rem;font-family:monospace;min-height:26px;'
-                        f'line-height:1.3;">${cost}</div>',
-                        unsafe_allow_html=True)
-
+           else:
+                        # Unreachable unclaimed
+                        opacity = "0.30" if not edge and not owned_any else "0.45"
+                        cols_w[col].markdown(
+                            f'<div style="background:{bg};opacity:{opacity};color:#fff;'
+                            f'border-radius:6px;text-align:center;padding:6px 2px;'
+                            f'font-size:.6rem;font-family:monospace;min-height:26px;'
+                            f'line-height:1.3;">${cost}</div>',
+                            unsafe_allow_html=True)   
+            
             elif owner == me:
                 # Owned by player
                 cols_w[col].markdown(
