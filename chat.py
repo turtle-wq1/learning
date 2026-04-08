@@ -988,6 +988,11 @@ with st.sidebar:
         st.rerun()
 
 
+Since the automatic refresh is now handling the cash updates, we can clean up the CONTENT ROUTING section by removing the "Earn Cash" button logic. This will make the UI much cleaner.
+
+Replace the bottom of your chat.py file (from the # CONTENT ROUTING header to the end) with this:
+
+Python
 # ══════════════════════════════════════════════════════════════════════════════
 # CONTENT ROUTING — always split screen (game left, chat right)
 # ══════════════════════════════════════════════════════════════════════════════
@@ -995,48 +1000,35 @@ st.markdown("""<style>
 button[title="View fullscreen"],[data-testid="StyledFullScreenButton"]{display:none!important;}
 </style>""", unsafe_allow_html=True)
 
-# Update the local cash variable from the DB
+# 1. Update the local cash variable from the DB at the start of every "pulse"
 my_cash = get_cash(me) 
 
-# Render the Split Screen Layout
+# 2. Render the Split Screen Layout
 game_col, chat_col = st.columns(2)
 
 with game_col:
-    # --- MANUAL REFRESH BUTTON ---
-    if "last_manual_earn" not in st.session_state:
-        st.session_state.last_manual_earn = 0
-    
-    elapsed_manual = time.time() - st.session_state.last_manual_earn
-    cooldown = 3
-    
-    if elapsed_manual < cooldown:
-        st.button(f"⏳ Cooling down ({int(cooldown - elapsed_manual)}s)", disabled=True, use_container_width=True)
-    else:
-        if st.button("💰 Earn Cash (Manual Refresh)", use_container_width=True):
-            collect_income(me, get_board())
-            st.session_state.last_manual_earn = time.time()
-            st.rerun()
-    
+    # We simply render the game; the 'my_cash' variable inside is now 
+    # being updated by the global pulse below.
     render_land_game(me)
 
 with chat_col:
     render_chat_panel(me)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# THE REFRESH ENGINE (Must be at the very bottom)
+# THE REFRESH ENGINE (The "Pulse")
 # ══════════════════════════════════════════════════════════════════════════════
 if "last_refresh" not in st.session_state:
     st.session_state.last_refresh = time.time()
 
-# Calculate how long since the last "Pulse"
+# Calculate how long since the last database fetch
 time_since_last = time.time() - st.session_state.last_refresh
 
 if time_since_last >= 3:
-    # Reset the timer and force a rerun
+    # 3 seconds have passed: Reset timer and rerun to pull new cash/income
     st.session_state.last_refresh = time.time()
     st.rerun()
 else:
-    # This is the secret: wait a tiny bit and then rerun to check the timer again
-    # This creates a "heartbeat" for the app
+    # Less than 3 seconds: Wait 1 second and check again.
+    # This keeps the app alive and responsive without lagging the server.
     time.sleep(1)
     st.rerun()
