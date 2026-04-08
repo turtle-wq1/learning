@@ -86,37 +86,37 @@ THEMES = {
         "border": "#22c55e", "accent": "#22c55e", "accent2": "#06b6d4",
         "green": "#4ade80", "text": "#e2e8f0", "muted": "#64748b",
         "dm_color": "#38bdf8", "own_bubble": "#052e16", "own_text": "#bbf7d0",
-   },
-  "Dracula": {
-      "bg": "#282a36", "surface": "#303341", "surface2": "#3a3f4b",
-        "border": "#44475a", "accent": "#bd93f9", "accent2": "#ff79c6",
-        "green": "#50fa7b", "text": "#f8f8f2", "muted": "#6272a4",
-        "dm_color": "#ffb86c", "own_bubble": "#44475a", "own_text": "#f8f8f2",
-    },
-    "Nord": {
-        "bg": "#2e3440", "surface": "#3b4252", "surface2": "#434c5e",
-        "border": "#4c566a", "accent": "#88c0d0", "accent2": "#81a1c1",
-        "green": "#a3be8c", "text": "#eceff4", "muted": "#81a1c1",
-        "dm_color": "#b48ead", "own_bubble": "#434c5e", "own_text": "#eceff4",
-    },
-    "Matrix": {
-        "bg": "#000000", "surface": "#050505", "surface2": "#0a0a0a",
-        "border": "#00ff41", "accent": "#00ff41", "accent2": "#39ff14",
-        "green": "#00ff41", "text": "#00ff41", "muted": "#008f11",
-        "dm_color": "#39ff14", "own_bubble": "#001a00", "own_text": "#00ff41",
-    },
-    "Cherry": {
-        "bg": "#140d11", "surface": "#1f141a", "surface2": "#2a1b23",
-        "border": "#3d2630", "accent": "#ff4d6d", "accent2": "#ff758f",
-        "green": "#4ade80", "text": "#ffe5ec", "muted": "#a86a7b",
-        "dm_color": "#ff8fab", "own_bubble": "#3b1f2a", "own_text": "#ffd6e0",
-    },
-    "Amber": {
-        "bg": "#1a1205", "surface": "#241807", "surface2": "#2e1f0a",
-        "border": "#4d320f", "accent": "#f59e0b", "accent2": "#fbbf24",
-        "green": "#84cc16", "text": "#fef3c7", "muted": "#b0892d",
-        "dm_color": "#facc15", "own_bubble": "#3a250c", "own_text": "#fde68a",
-    },
+     },
+    "Dracula": {
+    "bg": "#282a36", "surface": "#303341", "surface2": "#3a3f4b",
+    "border": "#44475a", "accent": "#bd93f9", "accent2": "#ff79c6",
+    "green": "#50fa7b", "text": "#f8f8f2", "muted": "#6272a4",
+    "dm_color": "#ffb86c", "own_bubble": "#44475a", "own_text": "#f8f8f2",
+},
+"Nord": {
+    "bg": "#2e3440", "surface": "#3b4252", "surface2": "#434c5e",
+    "border": "#4c566a", "accent": "#88c0d0", "accent2": "#81a1c1",
+    "green": "#a3be8c", "text": "#eceff4", "muted": "#81a1c1",
+    "dm_color": "#b48ead", "own_bubble": "#434c5e", "own_text": "#eceff4",
+},
+"Matrix": {
+    "bg": "#000000", "surface": "#050505", "surface2": "#0a0a0a",
+    "border": "#00ff41", "accent": "#00ff41", "accent2": "#39ff14",
+    "green": "#00ff41", "text": "#00ff41", "muted": "#008f11",
+    "dm_color": "#39ff14", "own_bubble": "#001a00", "own_text": "#00ff41",
+},
+"Cherry": {
+    "bg": "#140d11", "surface": "#1f141a", "surface2": "#2a1b23",
+    "border": "#3d2630", "accent": "#ff4d6d", "accent2": "#ff758f",
+    "green": "#4ade80", "text": "#ffe5ec", "muted": "#a86a7b",
+    "dm_color": "#ff8fab", "own_bubble": "#3b1f2a", "own_text": "#ffd6e0",
+},
+"Amber": {
+    "bg": "#1a1205", "surface": "#241807", "surface2": "#2e1f0a",
+    "border": "#4d320f", "accent": "#f59e0b", "accent2": "#fbbf24",
+    "green": "#84cc16", "text": "#fef3c7", "muted": "#b0892d",
+    "dm_color": "#facc15", "own_bubble": "#3a250c", "own_text": "#fde68a",
+},
 }
 THEME_ICONS = {
     "Default":"🟣",
@@ -643,112 +643,91 @@ def render_land_game(me):
 
     owned_any = my_cells > 0
     action_taken = False
-    
-# ── Grid ──────────────────────────────────────────────────────────────────
-if "land_board" not in st.session_state:
-    st.session_state.land_board = [
-        {"owner": None, "color": None}
-        for _ in range(GRID_ROWS * GRID_COLS)
-    ]
 
-if "land_players" not in st.session_state:
-    st.session_state.land_players = {}
+    # ── Grid ──────────────────────────────────────────────────────────────────
+    for row in range(GRID_ROWS):
+        cols_w = st.columns(GRID_COLS)
+        for col in range(GRID_COLS):
+            cell_id = row * GRID_COLS + col
+            cell = board[cell_id]
+            owner = cell["owner"]
+            cell_color_hex = cell["color"]
+            cost = cell_cost(row, col)
+            inc = cell_income(row, col)
+            edge = is_edge_cell(row, col)
+            affordable = my_cash >= cost
+            bg = cost_color(cost)
 
-board = st.session_state.land_board
-players = st.session_state.land_players
-
-me = st.session_state.land_me
-my_cash = players[me]["cash"]
-my_color = players[me]["color"]
-
-owned_any = any(c["owner"] == me for c in board)
-
-for row in range(GRID_ROWS):
-    cols_w = st.columns(GRID_COLS)
-
-    for col in range(GRID_COLS):
-        cell_id = row * GRID_COLS + col
-        cell = board[cell_id]
-        owner = cell["owner"]
-        cell_color_hex = cell["color"]
-        cost = cell_cost(row, col)
-        inc = cell_income(row, col)
-        edge = is_edge_cell(row, col)
-        affordable = my_cash >= cost
-        bg = cost_color(cost)
-
-        if owner is None:
-
-            if edge or not owned_any:
-                # Claimable empty cell
-                if affordable:
-                    label = f"${cost}"
-                    if cols_w[col].button(label, key=f"cell_{cell_id}", use_container_width=True):
-                        if deduct_cash(me, cost):
-                            claim_cell(cell_id, me, my_color)
-                            action_taken = True
+            if owner is None:
+                if not owned_any:
+                    can_click = edge
                 else:
+                    can_click = player_has_adjacent(cell_id, board, me)
+
+                if can_click:
+                    label = f"${cost}\n+{inc}"
+                    tip = f"Buy: ${cost} | Earns +${inc}/tick"
+                    if affordable:
+                        if cols_w[col].button(label, key=f"cell_{cell_id}", help=tip,
+                                              use_container_width=True):
+                            if deduct_cash(me, cost):
+                                claim_cell(cell_id, me, my_color)
+                                action_taken = True
+                    else:
+                        # Can't afford — show greyed
+                        cols_w[col].markdown(
+                            f'<div style="background:#1c1c1c;color:#444;border-radius:6px;'
+                            f'text-align:center;padding:6px 2px;font-size:.65rem;'
+                            f'font-family:monospace;min-height:26px;line-height:1.3;'
+                            f'border:1px dashed #333;">💸<br>${cost}</div>',
+                            unsafe_allow_html=True)
+                else:
+                    # Unreachable unclaimed
+                    opacity = "0.30" if not edge and not owned_any else "0.45"
                     cols_w[col].markdown(
-                        f'<div style="background:#1c1c1c;color:#444;border-radius:4px;'
-                        f'font-size:.52rem;font-family:monospace;'
-                        f'aspect-ratio:1/1;display:flex;align-items:center;'
-                        f'justify-content:center;border:1px dashed #333;">💸</div>',
-                        unsafe_allow_html=True
-                    )
+                        f'<div style="background:{bg};opacity:{opacity};color:#fff;'
+                        f'border-radius:6px;text-align:center;padding:6px 2px;'
+                        f'font-size:.6rem;font-family:monospace;min-height:26px;'
+                        f'line-height:1.3;">${cost}</div>',
+                        unsafe_allow_html=True)
+
+            elif owner == me:
+                # Owned by player
+                cols_w[col].markdown(
+                    f'<div style="background:{my_color};color:#fff;border-radius:6px;'
+                    f'text-align:center;padding:6px 2px;font-size:.65rem;'
+                    f'font-family:monospace;min-height:26px;line-height:1.3;'
+                    f'border:2px solid rgba(255,255,255,.35);">▣<br>+{inc}</div>',
+                    unsafe_allow_html=True)
 
             else:
-                opacity = "0.30"
-                cols_w[col].markdown(
-                    f'<div style="background:{bg};opacity:{opacity};color:#fff;'
-                    f'border-radius:4px;font-size:.52rem;font-family:monospace;'
-                    f'aspect-ratio:1/1;display:flex;align-items:center;'
-                    f'justify-content:center;">${cost}</div>',
-                    unsafe_allow_html=True
-                )
-
-        elif owner == me:
-            cols_w[col].markdown(
-                f'<div style="background:{my_color};color:#fff;border-radius:4px;'
-                f'font-size:.52rem;font-family:monospace;'
-                f'aspect-ratio:1/1;display:flex;align-items:center;'
-                f'justify-content:center;border:2px solid rgba(255,255,255,.35);">▣</div>',
-                unsafe_allow_html=True
-            )
-
-        else:
-            if player_has_adjacent(cell_id, board, me):
-
-                if affordable:
-                    label = f"${cost}"
-                    if cols_w[col].button(
-                        label,
-                        key=f"cell_{cell_id}",
-                        use_container_width=True
-                    ):
-                        if deduct_cash(me, cost):
-                            claim_cell(cell_id, me, my_color)
-                            action_taken = True
+                # Enemy cell
+                if player_has_adjacent(cell_id, board, me):
+                    label = f"⚔${cost}"
+                    tip = f"Attack! Cost ${cost}"
+                    if affordable:
+                        if cols_w[col].button(label, key=f"cell_{cell_id}", help=tip,
+                                              use_container_width=True):
+                            if deduct_cash(me, cost):
+                                claim_cell(cell_id, me, my_color)
+                                action_taken = True
+                    else:
+                        cols_w[col].markdown(
+                            f'<div style="background:{cell_color_hex};opacity:.45;color:#fff;'
+                            f'border-radius:6px;text-align:center;padding:6px 2px;'
+                            f'font-size:.6rem;font-family:monospace;min-height:26px;'
+                            f'line-height:1.3;border:1px dashed #fff;">💸⚔</div>',
+                            unsafe_allow_html=True)
                 else:
                     cols_w[col].markdown(
-                        f'<div style="background:{cell_color_hex};opacity:.45;color:#fff;'
-                        f'border-radius:4px;font-size:.52rem;'
-                        f'font-family:monospace;aspect-ratio:1/1;'
-                        f'display:flex;align-items:center;justify-content:center;'
-                        f'border:1px dashed #fff;">💸⚔</div>',
-                        unsafe_allow_html=True
-                    )
+                        f'<div style="background:{cell_color_hex};color:#fff;border-radius:6px;'
+                        f'text-align:center;padding:6px 2px;font-size:.65rem;'
+                        f'font-family:monospace;min-height:26px;line-height:1.3;'
+                        f'opacity:.8;">■<br>+{inc}</div>',
+                        unsafe_allow_html=True)
 
-            else:
-                cols_w[col].markdown(
-                    f'<div style="background:{cell_color_hex};color:#fff;'
-                    f'border-radius:4px;font-size:.52rem;font-family:monospace;'
-                    f'aspect-ratio:1/1;display:flex;align-items:center;'
-                    f'justify-content:center;opacity:.8;">■</div>',
-                    unsafe_allow_html=True
-                )
-
-if action_taken:
-    st.rerun()
+    if action_taken:
+        st.rerun()
 
     st.markdown("---")
 
