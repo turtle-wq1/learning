@@ -869,6 +869,9 @@ def render_land_game(me):
 def render_chat_panel(me):
     # ... (Keep your existing header logic)
 
+    if "active_dm" not in st.session_state:
+        st.session_state.active_dm = None
+
     active_dm = st.session_state.active_dm
     
     if active_dm:
@@ -879,6 +882,8 @@ def render_chat_panel(me):
         messages = get_dm_messages(me, active_dm)
     else:
         messages = get_global_messages()
+
+        st.rerun()
 
     # Display messages
     render_messages(messages, me)
