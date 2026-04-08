@@ -117,7 +117,6 @@ THEMES = {
         "green": "#84cc16", "text": "#fef3c7", "muted": "#b0892d",
         "dm_color": "#facc15", "own_bubble": "#3a250c", "own_text": "#fde68a",
     },
-5. Upd
 }
 THEME_ICONS = {
     "Default":"🟣",
