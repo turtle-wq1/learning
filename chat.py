@@ -86,7 +86,38 @@ THEMES = {
         "border": "#22c55e", "accent": "#22c55e", "accent2": "#06b6d4",
         "green": "#4ade80", "text": "#e2e8f0", "muted": "#64748b",
         "dm_color": "#38bdf8", "own_bubble": "#052e16", "own_text": "#bbf7d0",
-     },
+   },
+  "Dracula": {
+      "bg": "#282a36", "surface": "#303341", "surface2": "#3a3f4b",
+        "border": "#44475a", "accent": "#bd93f9", "accent2": "#ff79c6",
+        "green": "#50fa7b", "text": "#f8f8f2", "muted": "#6272a4",
+        "dm_color": "#ffb86c", "own_bubble": "#44475a", "own_text": "#f8f8f2",
+    },
+    "Nord": {
+        "bg": "#2e3440", "surface": "#3b4252", "surface2": "#434c5e",
+        "border": "#4c566a", "accent": "#88c0d0", "accent2": "#81a1c1",
+        "green": "#a3be8c", "text": "#eceff4", "muted": "#81a1c1",
+        "dm_color": "#b48ead", "own_bubble": "#434c5e", "own_text": "#eceff4",
+    },
+    "Matrix": {
+        "bg": "#000000", "surface": "#050505", "surface2": "#0a0a0a",
+        "border": "#00ff41", "accent": "#00ff41", "accent2": "#39ff14",
+        "green": "#00ff41", "text": "#00ff41", "muted": "#008f11",
+        "dm_color": "#39ff14", "own_bubble": "#001a00", "own_text": "#00ff41",
+    },
+    "Cherry": {
+        "bg": "#140d11", "surface": "#1f141a", "surface2": "#2a1b23",
+        "border": "#3d2630", "accent": "#ff4d6d", "accent2": "#ff758f",
+        "green": "#4ade80", "text": "#ffe5ec", "muted": "#a86a7b",
+        "dm_color": "#ff8fab", "own_bubble": "#3b1f2a", "own_text": "#ffd6e0",
+    },
+    "Amber": {
+        "bg": "#1a1205", "surface": "#241807", "surface2": "#2e1f0a",
+        "border": "#4d320f", "accent": "#f59e0b", "accent2": "#fbbf24",
+        "green": "#84cc16", "text": "#fef3c7", "muted": "#b0892d",
+        "dm_color": "#facc15", "own_bubble": "#3a250c", "own_text": "#fde68a",
+    },
+5. Upd
 }
 THEME_ICONS = {
     "Default":"🟣",
@@ -96,7 +127,12 @@ THEME_ICONS = {
     "Ocean":"🌊",
     "Neon":"🟢",
     "Light":"☀️",
-    "Cyber":"⚡"
+    "Cyber":"⚡",
+    "Dracula":"🧛",
+    "Nord":"❄️",
+    "Matrix":"💻",
+    "Cherry":"🍒",
+    "Amber":"🟠"
 }
 
 st.set_page_config(page_title="GChat", page_icon="💬", layout="wide", initial_sidebar_state="expanded")
@@ -630,7 +666,7 @@ def render_land_game(me):
                     can_click = player_has_adjacent(cell_id, board, me)
 
                 if can_click:
-                    label = f"${cost}\n+{inc}"
+                   label = f"${cost}"
                     tip = f"Buy: ${cost} | Earns +${inc}/tick"
                     if affordable:
                         if cols_w[col].button(label, key=f"cell_{cell_id}", help=tip,
@@ -662,13 +698,13 @@ def render_land_game(me):
                     f'<div style="background:{my_color};color:#fff;border-radius:6px;'
                     f'text-align:center;padding:6px 2px;font-size:.65rem;'
                     f'font-family:monospace;min-height:26px;line-height:1.3;'
-                    f'border:2px solid rgba(255,255,255,.35);">▣<br>+{inc}</div>',
+                    f'border:2px solid rgba(255,255,255,.35);">▣</div>',
                     unsafe_allow_html=True)
 
             else:
                 # Enemy cell
                 if player_has_adjacent(cell_id, board, me):
-                    label = f"⚔${cost}"
+                    label = f"${cost}"
                     tip = f"Attack! Cost ${cost}"
                     if affordable:
                         if cols_w[col].button(label, key=f"cell_{cell_id}", help=tip,
