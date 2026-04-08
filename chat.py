@@ -988,11 +988,6 @@ with st.sidebar:
         st.rerun()
 
 
-Since the automatic refresh is now handling the cash updates, we can clean up the CONTENT ROUTING section by removing the "Earn Cash" button logic. This will make the UI much cleaner.
-
-Replace the bottom of your chat.py file (from the # CONTENT ROUTING header to the end) with this:
-
-Python
 # ══════════════════════════════════════════════════════════════════════════════
 # CONTENT ROUTING — always split screen (game left, chat right)
 # ══════════════════════════════════════════════════════════════════════════════
