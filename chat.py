@@ -12,11 +12,11 @@ GRID_COLS = GRID_SIZE
 TOTAL_CELLS = GRID_ROWS * GRID_COLS
 
 # Income tick: every N seconds players collect rent from their cells
-INCOME_INTERVAL = 30
+INCOME_INTERVAL = 3
 # Leader cash bonus every tick
-LEADER_BONUS = 15
+LEADER_BONUS = 10
 # Starting cash
-STARTING_CASH = 100
+STARTING_CASH = 200
 # Vote-to-reset threshold
 RESET_VOTE_THRESHOLD = 0.75
 
@@ -28,7 +28,7 @@ def cell_cost(row, col):
     dist = math.sqrt((col - cx) ** 2 + (row - cy) ** 2)
     max_dist = math.sqrt(cx ** 2 + cy ** 2)
     norm = dist / max_dist          # 1 at corner, 0 at centre
-    return max(5, round((1 - norm) * 75 + 5))
+    return max(5, round((1 - norm) * 75 + 5) * 10)
 
 def cell_income(row, col):
     """Income per tick ~10% of cost, min $1."""
