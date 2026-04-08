@@ -665,11 +665,11 @@ def render_land_game(me):
                     can_click = player_has_adjacent(cell_id, board, me)
 
                 if can_click:
-                   label = f"${cost}"
-                   tip = f"Buy: ${cost} | Earns +${inc}/tick"
-                    if affordable:
-                        if cols_w[col].button(label, key=f"cell_{cell_id}", help=tip,
-                                              use_container_width=True):
+                  label = f"${cost}"
+                  tip = f"Buy: ${cost} | Earns +${inc}/tick"
+                  if affordable:
+                     if cols_w[col].button(label, key=f"cell_{cell_id}", help=tip,
+                        use_container_width=True):
                             if deduct_cash(me, cost):
                                 claim_cell(cell_id, me, my_color)
                                 action_taken = True
