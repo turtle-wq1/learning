@@ -6,8 +6,9 @@ import math
 DB = "gchat.db"
 
 # ─── Grid config ──────────────────────────────────────────────────────────────
-GRID_ROWS = 12
-GRID_COLS = 16
+GRID_SIZE = 20
+GRID_ROWS = GRID_SIZE
+GRID_COLS = GRID_SIZE
 TOTAL_CELLS = GRID_ROWS * GRID_COLS
 
 # Income tick: every N seconds players collect rent from their cells
@@ -68,8 +69,35 @@ THEMES = {
         "green": "#4ade80", "text": "#ecfeff", "muted": "#4a7a8a",
         "dm_color": "#818cf8", "own_bubble": "#0c2233", "own_text": "#a5f3fc",
     },
+    "Neon": {
+        "bg": "#050505", "surface": "#0c0c0c", "surface2": "#141414",
+        "border": "#2affd5", "accent": "#ff00ff", "accent2": "#00ffff",
+        "green": "#39ff14", "text": "#ffffff", "muted": "#888",
+        "dm_color": "#00ffff", "own_bubble": "#1a0033", "own_text": "#ffccff",
+    },
+    "Light": {
+        "bg": "#f5f7fb", "surface": "#ffffff", "surface2": "#eef1f7",
+        "border": "#d6dbe6", "accent": "#4a6cff", "accent2": "#ff5c7a",
+        "green": "#2ecc71", "text": "#111", "muted": "#666",
+        "dm_color": "#ff7a18", "own_bubble": "#e6ecff", "own_text": "#111",
+    },
+    "Cyber": {
+        "bg": "#020617", "surface": "#020617", "surface2": "#0f172a",
+        "border": "#22c55e", "accent": "#22c55e", "accent2": "#06b6d4",
+        "green": "#4ade80", "text": "#e2e8f0", "muted": "#64748b",
+        "dm_color": "#38bdf8", "own_bubble": "#052e16", "own_text": "#bbf7d0",
+     },
 }
-THEME_ICONS = {"Default":"🟣","Midnight":"🌙","Sunset":"🌅","Forest":"🌿","Ocean":"🌊"}
+THEME_ICONS = {
+    "Default":"🟣",
+    "Midnight":"🌙",
+    "Sunset":"🌅",
+    "Forest":"🌿",
+    "Ocean":"🌊",
+    "Neon":"🟢",
+    "Light":"☀️",
+    "Cyber":"⚡"
+}
 
 st.set_page_config(page_title="GChat", page_icon="💬", layout="wide", initial_sidebar_state="expanded")
 
@@ -155,8 +183,9 @@ div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover {{opacity:1!
 /* ── Game grid — bigger cells ── */
 div[data-testid="stHorizontalBlock"] button[kind="primary"],
 div[data-testid="stHorizontalBlock"] button[kind="secondary"].game-cell {{
-    min-height:48px!important; height:48px!important;
-    font-size:.72rem!important; font-family:'Space Mono',monospace!important;
+   min-height:26px!important;
+    height:26px!important;
+    font-size:.55rem!important; font-family:'Space Mono',monospace!important;
     border-radius:6px!important; line-height:1.2!important;
     padding:2px 1px!important;
 }}
@@ -614,7 +643,7 @@ def render_land_game(me):
                         cols_w[col].markdown(
                             f'<div style="background:#1c1c1c;color:#444;border-radius:6px;'
                             f'text-align:center;padding:6px 2px;font-size:.65rem;'
-                            f'font-family:monospace;min-height:48px;line-height:1.3;'
+                            f'font-family:monospace;min-height:26px;line-height:1.3;'
                             f'border:1px dashed #333;">💸<br>${cost}</div>',
                             unsafe_allow_html=True)
                 else:
@@ -623,7 +652,7 @@ def render_land_game(me):
                     cols_w[col].markdown(
                         f'<div style="background:{bg};opacity:{opacity};color:#fff;'
                         f'border-radius:6px;text-align:center;padding:6px 2px;'
-                        f'font-size:.6rem;font-family:monospace;min-height:48px;'
+                        f'font-size:.6rem;font-family:monospace;min-height:26px;'
                         f'line-height:1.3;">${cost}</div>',
                         unsafe_allow_html=True)
 
@@ -632,7 +661,7 @@ def render_land_game(me):
                 cols_w[col].markdown(
                     f'<div style="background:{my_color};color:#fff;border-radius:6px;'
                     f'text-align:center;padding:6px 2px;font-size:.65rem;'
-                    f'font-family:monospace;min-height:48px;line-height:1.3;'
+                    f'font-family:monospace;min-height:26px;line-height:1.3;'
                     f'border:2px solid rgba(255,255,255,.35);">▣<br>+{inc}</div>',
                     unsafe_allow_html=True)
 
@@ -651,14 +680,14 @@ def render_land_game(me):
                         cols_w[col].markdown(
                             f'<div style="background:{cell_color_hex};opacity:.45;color:#fff;'
                             f'border-radius:6px;text-align:center;padding:6px 2px;'
-                            f'font-size:.6rem;font-family:monospace;min-height:48px;'
+                            f'font-size:.6rem;font-family:monospace;min-height:26px;'
                             f'line-height:1.3;border:1px dashed #fff;">💸⚔</div>',
                             unsafe_allow_html=True)
                 else:
                     cols_w[col].markdown(
                         f'<div style="background:{cell_color_hex};color:#fff;border-radius:6px;'
                         f'text-align:center;padding:6px 2px;font-size:.65rem;'
-                        f'font-family:monospace;min-height:48px;line-height:1.3;'
+                        f'font-family:monospace;min-height:26px;line-height:1.3;'
                         f'opacity:.8;">■<br>+{inc}</div>',
                         unsafe_allow_html=True)
 
@@ -902,6 +931,10 @@ with game_col:
 with chat_col:
     render_chat_panel(me)
 
-# Poll every 3s for new messages / income ticks
-time.sleep(3)
-st.rerun()
+# Smooth auto refresh (prevents flashing)
+if "last_refresh" not in st.session_state:
+    st.session_state.last_refresh = time.time()
+
+if time.time() - st.session_state.last_refresh > 3:
+    st.session_state.last_refresh = time.time()
+    st.rerun()
