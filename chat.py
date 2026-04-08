@@ -883,7 +883,7 @@ def render_chat_panel(me):
     else:
         messages = get_global_messages()
 
-        st.rerun()
+    
 
     # Display messages
     render_messages(messages, me)
