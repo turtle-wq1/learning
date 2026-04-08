@@ -973,6 +973,31 @@ me = st.session_state.username
 heartbeat(me)
 ensure_player(me)
 
+# --- somewhere near the top of your Streamlit page ---
+chat_mode = st.radio("Chat mode", ["Global", "Direct Messages"], horizontal=True)
+
+if chat_mode == "Global":
+    messages = get_global_messages()  # fetch global messages only
+    render_messages(messages, me)     # render global chat
+    # Optional: input box for global chat
+    content = st.chat_input("Type a message")
+    if content:
+        send_message(me, content)    # recipient is None for global
+
+elif chat_mode == "Direct Messages":
+    # Select the recipient for DM
+    other_users = [u for u in get_online_users() if u != me]
+    if other_users:
+        recipient = st.selectbox("Recipient", other_users)
+        messages = get_dm_messages(me, recipient)
+        render_messages(messages, me)
+        # Input box for DMs
+        content = st.chat_input(f"Message to {recipient}")
+        if content:
+            send_message(me, content, recipient)
+    else:
+        st.info("No other users online for direct messages.")
+
 current_id = get_last_msg_id()
 if current_id != st.session_state.last_msg_id:
     st.session_state.last_msg_id = current_id
