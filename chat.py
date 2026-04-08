@@ -12,7 +12,7 @@ GRID_COLS = GRID_SIZE
 TOTAL_CELLS = GRID_ROWS * GRID_COLS
 
 # Income tick: every N seconds players collect rent from their cells
-INCOME_INTERVAL = 30
+INCOME_INTERVAL = 3
 # Leader cash bonus every tick
 LEADER_BONUS = 15
 # Starting cash
@@ -412,7 +412,10 @@ def get_cash(username):
     con = get_conn()
     row = con.execute("SELECT cash FROM player_cash WHERE username=?", (username,)).fetchone()
     con.close()
-    return row[0] if row else STARTING_CASH
+    current_cash = row[0] if row else STARTING_CASH
+    # Store in session state so the UI updates instantly
+    st.session_state.my_cash = current_cash
+    return current_cash
 
 def add_cash(username, amount):
     con = get_conn()
@@ -432,27 +435,32 @@ def deduct_cash(username, amount):
     return True
 
 def collect_income(username, board):
-    """Credit income if INCOME_INTERVAL has elapsed since last tick."""
     con = get_conn()
-    row = con.execute("SELECT last_income_tick FROM player_cash WHERE username=?",
+    row = con.execute("SELECT last_income_tick, cash FROM player_cash WHERE username=?",
                       (username,)).fetchone()
     if not row:
         con.close(); return 0
-    last = row[0]
+    
+    last_tick, current_balance = row
     now = time.time()
-    if now - last < INCOME_INTERVAL:
+    
+    if now - last_tick < INCOME_INTERVAL:
         con.close(); return 0
+        
+    # Calculate earnings...
     earned = 0
     for cell_id, cell in board.items():
         if cell["owner"] == username:
             r, c = divmod(cell_id, GRID_COLS)
             earned += cell_income(r, c)
-    counts = get_territory_counts()
-    if counts and counts[0][0] == username:
-        earned += LEADER_BONUS
-    con.execute("UPDATE player_cash SET cash=cash+?,last_income_tick=? WHERE username=?",
-                (earned, now, username))
+            
+    new_cash = current_balance + earned
+    con.execute("UPDATE player_cash SET cash=?, last_income_tick=? WHERE username=?",
+                (new_cash, now, username))
     con.commit(); con.close()
+    
+    # Immediately update the UI state
+    st.session_state.my_cash = new_cash
     return earned
 
 # ── Board helpers ──────────────────────────────────────────────────────────────
@@ -627,7 +635,7 @@ def render_land_game(me):
     # Stats row
     sc = st.columns(5)
     sc[0].markdown(f'<div class="stat-box"><div class="stat-label">Your Cash</div>'
-                   f'<div class="stat-val">${my_cash:.0f}</div></div>', unsafe_allow_html=True)
+                   f'<div class="stat-val">${st.session_state.my_cash:.0f}</div></div>', unsafe_allow_html=True)
     sc[1].markdown(f'<div class="stat-box"><div class="stat-label">Territory</div>'
                    f'<div class="stat-val">{my_cells} cells</div></div>', unsafe_allow_html=True)
     sc[2].markdown(f'<div class="stat-box"><div class="stat-label">Income/tick</div>'
