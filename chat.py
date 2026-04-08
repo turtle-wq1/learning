@@ -645,6 +645,9 @@ def render_land_game(me):
     action_taken = False
     
 # ── Grid ──────────────────────────────────────────────────────────────────
+if "land_board" not in st.session_state:
+    init_land_game()
+
 board = st.session_state.land_board
 players = st.session_state.land_players
 
