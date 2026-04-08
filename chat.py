@@ -237,7 +237,7 @@ div[data-testid="stHorizontalBlock"] button[kind="primary"],
 div[data-testid="stHorizontalBlock"] button[kind="secondary"].game-cell {{
    min-height:26px!important;
     height:26px!important;
-    font-size:.55rem!important; font-family:'Space Mono',monospace!important;
+    font-size:.3rem!important; font-family:'Space Mono',monospace!important;
     border-radius:6px!important; line-height:1.2!important;
     padding:2px 1px!important;
 }}
