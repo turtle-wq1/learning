@@ -28,7 +28,7 @@ def cell_cost(row, col):
     dist = math.sqrt((col - cx) ** 2 + (row - cy) ** 2)
     max_dist = math.sqrt(cx ** 2 + cy ** 2)
     norm = dist / max_dist          # 1 at corner, 0 at centre
-    return max(5, round((1 - norm) * 75 + 5))
+    return max(5, round((1 - norm) * 75 + 5) * 5)
 
 def cell_income(row, col):
     """Income per tick ~10% of cost, min $1."""
