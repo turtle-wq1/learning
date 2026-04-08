@@ -87,17 +87,34 @@ THEMES = {
         "green": "#4ade80", "text": "#e2e8f0", "muted": "#64748b",
         "dm_color": "#38bdf8", "own_bubble": "#052e16", "own_text": "#bbf7d0",
      },
-    "Dracula": {
-    "bg": "#282a36", "surface": "#303341", "surface2": "#3a3f4b",
-    "border": "#44475a", "accent": "#bd93f9", "accent2": "#ff79c6",
-    "green": "#50fa7b", "text": "#f8f8f2", "muted": "#6272a4",
-    "dm_color": "#ffb86c", "own_bubble": "#44475a", "own_text": "#f8f8f2",
+"Dracula": {
+    "bg": "#000000",         # black background
+    "surface": "#330000",    # dark red surfaces
+    "surface2": "#550000",   # slightly lighter dark red
+    "border": "#ff0000",     # red borders
+    "accent": "#ff0000",     # red accents
+    "accent2": "#ff4d4d",    # lighter red accent
+    "green": "#ff3333",      # "green" replaced with red
+    "text": "#ff0000",       # red text
+    "muted": "#990000",      # muted/darker red
+    "dm_color": "#ff3333",   # red DM color
+    "own_bubble": "#550000", # chat bubble background
+    "own_text": "#ff6666",   # chat bubble text
 },
+
 "Nord": {
-    "bg": "#2e3440", "surface": "#3b4252", "surface2": "#434c5e",
-    "border": "#4c566a", "accent": "#88c0d0", "accent2": "#81a1c1",
-    "green": "#a3be8c", "text": "#eceff4", "muted": "#81a1c1",
-    "dm_color": "#b48ead", "own_bubble": "#434c5e", "own_text": "#eceff4",
+    "bg": "#2e3440",
+    "surface": "#3b4252",
+    "surface2": "#434c5e",
+    "border": "#1e90ff",     # bright blue outlines
+    "accent": "#88c0d0",
+    "accent2": "#81a1c1",
+    "green": "#a3be8c",
+    "text": "#eceff4",
+    "muted": "#81a1c1",
+    "dm_color": "#b48ead",
+    "own_bubble": "#434c5e",
+    "own_text": "#eceff4",
 },
 "Matrix": {
     "bg": "#000000", "surface": "#050505", "surface2": "#0a0a0a",
