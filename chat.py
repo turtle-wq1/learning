@@ -633,6 +633,7 @@ def render_land_game(me):
                 unsafe_allow_html=True)
 
     # Stats row
+    get_cash(me) # This forces an update of st.session_state.my_cash
     sc = st.columns(5)
     sc[0].markdown(f'<div class="stat-box"><div class="stat-label">Your Cash</div>'
                    f'<div class="stat-val">${st.session_state.my_cash:.0f}</div></div>', unsafe_allow_html=True)
