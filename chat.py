@@ -21,6 +21,18 @@ STARTING_CASH = 200
 RESET_VOTE_THRESHOLD = 0.75
 
 # ─── Cell cost / income helpers ───────────────────────────────────────────────
+
+
+from streamlit_autorefresh import st_autorefresh
+
+# Auto-refresh every INCOME_INTERVAL seconds (in milliseconds)
+st_autorefresh(interval=INCOME_INTERVAL*1000, key="income_tick")
+
+earned = collect_income(me, board)
+if earned > 0:
+    st.toast(f"💰 +${earned} income collected!", icon="💰")
+
+
 def cell_cost(row, col):
     """Cost increases toward the centre. Outer edge = $5, dead-centre ~$80."""
     cx = (GRID_COLS - 1) / 2
