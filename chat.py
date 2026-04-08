@@ -269,15 +269,21 @@ div[data-testid="stHorizontalBlock"] button[kind="secondary"].game-cell {{
 .delete-btn button:hover {{opacity:1!important;background:rgba(255,107,107,.15)!important;}}
 
 /* Update these sections in your <style> block */
+
 button.game-cell, 
 div[data-testid="stHorizontalBlock"] button[kind="primary"],
 div[data-testid="stHorizontalBlock"] button[kind="secondary"].game-cell {{
-    font-size: 0.6rem !important; /* Slightly larger for readability */
-    min-height: 40px !important;  /* Taller to fit two lines of text */
-    height: auto !important;
-    line-height: 1.1 !important;
-    padding: 5px 2px !important;
-    white-space: pre-wrap !important; /* Allows the $cost and +inc to sit nicely */
+    font-size: 0.65rem !important; 
+    height: 30px !important;      /* Keep it short */
+    min-height: 30px !important;  /* Keep it short */
+    padding: 0px !important;      /* Remove top/bottom padding to keep it slim */
+    width: 100% !important;
+    line-height: 1 !important;
+}}
+
+/* This is the most important part for width */
+div[data-testid="stHorizontalBlock"] {{
+    gap: 2px !important; /* Tiny gap between buttons means more room for the button itself */
 }}
 </style>
 """, unsafe_allow_html=True)
