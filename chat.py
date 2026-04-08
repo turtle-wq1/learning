@@ -643,104 +643,94 @@ def render_land_game(me):
 
     owned_any = my_cells > 0
     action_taken = False
+    
+# ── Grid ──────────────────────────────────────────────────────────────────
+for row in range(GRID_ROWS):
+    cols_w = st.columns(GRID_COLS)
 
-    # ── Grid ──────────────────────────────────────────────────────────────────
-    for row in range(GRID_ROWS):
-        cols_w = st.columns(GRID_COLS)
-        for col in range(GRID_COLS):
-            cell_id = row * GRID_COLS + col
-            cell = board[cell_id]
-            owner = cell["owner"]
-            cell_color_hex = cell["color"]
-            cost = cell_cost(row, col)
-            inc = cell_income(row, col)
-            edge = is_edge_cell(row, col)
-            affordable = my_cash >= cost
-            bg = cost_color(cost)
+    for col in range(GRID_COLS):
+        cell_id = row * GRID_COLS + col
+        cell = board[cell_id]
+        owner = cell["owner"]
+        cell_color_hex = cell["color"]
+        cost = cell_cost(row, col)
+        inc = cell_income(row, col)
+        edge = is_edge_cell(row, col)
+        affordable = my_cash >= cost
+        bg = cost_color(cost)
 
         if owner is None:
 
-    if edge or not owned_any:
-        # Claimable empty cell
-        if affordable:
-            label = f"${cost}"
-            if cols_w[col].button(label, key=f"cell_{cell_id}", use_container_width=True):
-                if deduct_cash(me, cost):
-                    claim_cell(cell_id, me, my_color)
-                    action_taken = True
-        else:
-            # Can't afford — show greyed
+            if edge or not owned_any:
+                # Claimable empty cell
+                if affordable:
+                    label = f"${cost}"
+                    if cols_w[col].button(label, key=f"cell_{cell_id}", use_container_width=True):
+                        if deduct_cash(me, cost):
+                            claim_cell(cell_id, me, my_color)
+                            action_taken = True
+                else:
+                    cols_w[col].markdown(
+                        f'<div style="background:#1c1c1c;color:#444;border-radius:4px;'
+                        f'font-size:.52rem;font-family:monospace;'
+                        f'aspect-ratio:1/1;display:flex;align-items:center;'
+                        f'justify-content:center;border:1px dashed #333;">💸</div>',
+                        unsafe_allow_html=True
+                    )
+
+            else:
+                opacity = "0.30"
+                cols_w[col].markdown(
+                    f'<div style="background:{bg};opacity:{opacity};color:#fff;'
+                    f'border-radius:4px;font-size:.52rem;font-family:monospace;'
+                    f'aspect-ratio:1/1;display:flex;align-items:center;'
+                    f'justify-content:center;">${cost}</div>',
+                    unsafe_allow_html=True
+                )
+
+        elif owner == me:
             cols_w[col].markdown(
-                f'<div style="background:#1c1c1c;color:#444;border-radius:4px;'
-                f'text-align:center;padding:0;font-size:.52rem;'
-                f'font-family:monospace;aspect-ratio:1/1;display:flex;'
-                f'align-items:center;justify-content:center;'
-                f'border:1px dashed #333;">💸</div>',
+                f'<div style="background:{my_color};color:#fff;border-radius:4px;'
+                f'font-size:.52rem;font-family:monospace;'
+                f'aspect-ratio:1/1;display:flex;align-items:center;'
+                f'justify-content:center;border:2px solid rgba(255,255,255,.35);">▣</div>',
                 unsafe_allow_html=True
             )
 
-    else:
-        # Unreachable unclaimed
-        opacity = "0.30" if not edge and not owned_any else "0.45"
-        cols_w[col].markdown(
-            f'<div style="background:{bg};opacity:{opacity};color:#fff;'
-            f'border-radius:4px;text-align:center;'
-            f'font-size:.52rem;font-family:monospace;'
-            f'aspect-ratio:1/1;display:flex;'
-            f'align-items:center;justify-content:center;">'
-            f'${cost}</div>',
-            unsafe_allow_html=True
-        )
-
-elif owner == me:
-    # Owned by player
-    cols_w[col].markdown(
-        f'<div style="background:{my_color};color:#fff;border-radius:4px;'
-        f'text-align:center;font-size:.52rem;'
-        f'font-family:monospace;aspect-ratio:1/1;'
-        f'display:flex;align-items:center;justify-content:center;'
-        f'border:2px solid rgba(255,255,255,.35);">▣</div>',
-        unsafe_allow_html=True
-    )
-
-else:
-    # Enemy cell
-    if player_has_adjacent(cell_id, board, me):
-
-        if affordable:
-            label = f"${cost}"
-            tip = f"Attack! Cost ${cost}"
-            if cols_w[col].button(
-                label,
-                key=f"cell_{cell_id}",
-                help=tip,
-                use_container_width=True
-            ):
-                if deduct_cash(me, cost):
-                    claim_cell(cell_id, me, my_color)
-                    action_taken = True
         else:
-            cols_w[col].markdown(
-                f'<div style="background:{cell_color_hex};opacity:.45;color:#fff;'
-                f'border-radius:4px;font-size:.52rem;'
-                f'font-family:monospace;aspect-ratio:1/1;'
-                f'display:flex;align-items:center;justify-content:center;'
-                f'border:1px dashed #fff;">💸⚔</div>',
-                unsafe_allow_html=True
-            )
+            if player_has_adjacent(cell_id, board, me):
 
-    else:
-        cols_w[col].markdown(
-            f'<div style="background:{cell_color_hex};color:#fff;border-radius:4px;'
-            f'font-size:.52rem;font-family:monospace;'
-            f'aspect-ratio:1/1;display:flex;'
-            f'align-items:center;justify-content:center;'
-            f'opacity:.8;">■</div>',
-            unsafe_allow_html=True
-        )
+                if affordable:
+                    label = f"${cost}"
+                    if cols_w[col].button(
+                        label,
+                        key=f"cell_{cell_id}",
+                        use_container_width=True
+                    ):
+                        if deduct_cash(me, cost):
+                            claim_cell(cell_id, me, my_color)
+                            action_taken = True
+                else:
+                    cols_w[col].markdown(
+                        f'<div style="background:{cell_color_hex};opacity:.45;color:#fff;'
+                        f'border-radius:4px;font-size:.52rem;'
+                        f'font-family:monospace;aspect-ratio:1/1;'
+                        f'display:flex;align-items:center;justify-content:center;'
+                        f'border:1px dashed #fff;">💸⚔</div>',
+                        unsafe_allow_html=True
+                    )
 
-    if action_taken:
-        st.rerun()
+            else:
+                cols_w[col].markdown(
+                    f'<div style="background:{cell_color_hex};color:#fff;'
+                    f'border-radius:4px;font-size:.52rem;font-family:monospace;'
+                    f'aspect-ratio:1/1;display:flex;align-items:center;'
+                    f'justify-content:center;opacity:.8;">■</div>',
+                    unsafe_allow_html=True
+                )
+
+if action_taken:
+    st.rerun()
 
     st.markdown("---")
 
