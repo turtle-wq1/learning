@@ -995,25 +995,24 @@ st.markdown("""<style>
 button[title="View fullscreen"],[data-testid="StyledFullScreenButton"]{display:none!important;}
 </style>""", unsafe_allow_html=True)
 
-# 1. Update the local cash variable from the DB
+# Update the local cash variable from the DB
 my_cash = get_cash(me) 
 
-# 2. Render the Split Screen Layout
+# Render the Split Screen Layout
 game_col, chat_col = st.columns(2)
 
 with game_col:
-    # --- MANUAL REFRESH BUTTON WITH COOLDOWN ---
+    # --- MANUAL REFRESH BUTTON ---
     if "last_manual_earn" not in st.session_state:
         st.session_state.last_manual_earn = 0
     
-    elapsed = time.time() - st.session_state.last_manual_earn
+    elapsed_manual = time.time() - st.session_state.last_manual_earn
     cooldown = 3
     
-    if elapsed < cooldown:
-        st.button(f"⏳ Cooling down ({int(cooldown - elapsed)}s)", disabled=True, use_container_width=True)
+    if elapsed_manual < cooldown:
+        st.button(f"⏳ Cooling down ({int(cooldown - elapsed_manual)}s)", disabled=True, use_container_width=True)
     else:
         if st.button("💰 Earn Cash (Manual Refresh)", use_container_width=True):
-            # This triggers the income collection and a refresh
             collect_income(me, get_board())
             st.session_state.last_manual_earn = time.time()
             st.rerun()
@@ -1023,13 +1022,21 @@ with game_col:
 with chat_col:
     render_chat_panel(me)
 
-# 3. Smooth Auto-Refresh Logic (Background)
+# ══════════════════════════════════════════════════════════════════════════════
+# THE REFRESH ENGINE (Must be at the very bottom)
+# ══════════════════════════════════════════════════════════════════════════════
 if "last_refresh" not in st.session_state:
     st.session_state.last_refresh = time.time()
 
-if time.time() - st.session_state.last_refresh > 3:
+# Calculate how long since the last "Pulse"
+time_since_last = time.time() - st.session_state.last_refresh
+
+if time_since_last >= 3:
+    # Reset the timer and force a rerun
     st.session_state.last_refresh = time.time()
     st.rerun()
-
-# Small sleep to keep the app responsive
-time.sleep(0.1)
+else:
+    # This is the secret: wait a tiny bit and then rerun to check the timer again
+    # This creates a "heartbeat" for the app
+    time.sleep(1)
+    st.rerun()
