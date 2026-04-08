@@ -358,6 +358,7 @@ def delete_message(msg_id):
     con.execute("DELETE FROM messages WHERE id=?", (msg_id,))
     con.execute("DELETE FROM reactions WHERE msg_id=?", (msg_id,))
     con.commit(); con.close()
+    st.rerun()
 
 def heartbeat(username):
     con = get_conn()
