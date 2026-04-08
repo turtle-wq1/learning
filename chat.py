@@ -974,14 +974,24 @@ if current_id != st.session_state.last_msg_id:
 
 online_users = get_online_users()
 
-# ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown('<div class="gchat-title">gchat</div>', unsafe_allow_html=True)
+    
+    # --- ADMIN / LOGIN DISPLAY ---
     if me == "admin":
         st.markdown(f'<div class="gchat-sub"><span style="color:#ffd700;font-weight:700;">👑 {me}</span> <span style="background:linear-gradient(135deg,#b8860b,#ffd700);color:#000;padding:1px 6px;border-radius:4px;font-size:.6rem;font-family:Space Mono,monospace;font-weight:700;">ADMIN</span></div>', unsafe_allow_html=True)
     else:
         st.markdown(f'<div class="gchat-sub">logged in as {me}</div>', unsafe_allow_html=True)
 
+    # ─── NAVIGATION BUTTONS (ADD THIS HERE) ───
+    st.markdown('<div class="section-label">Navigation</div>', unsafe_allow_html=True)
+    
+    # This button forces the app back to Global Chat
+    if st.button("🌍 Global Chat", use_container_width=True):
+        st.session_state.active_dm = None
+        st.rerun()
+
+    st.divider()
     # ── DM / channel nav ─────────────────────────────────────────────────────
     st.markdown('<div class="section-label">💬 Chat</div>', unsafe_allow_html=True)
     if st.button("# global", use_container_width=True, key="global_btn"):
