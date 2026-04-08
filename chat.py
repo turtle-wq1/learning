@@ -673,7 +673,7 @@ def render_land_game(me):
                             if deduct_cash(me, cost):
                                 claim_cell(cell_id, me, my_color)
                                 action_taken = True
-                    else:
+                else:
                         # Can't afford — show greyed
                         cols_w[col].markdown(
                             f'<div style="background:#1c1c1c;color:#444;border-radius:6px;'
