@@ -268,15 +268,16 @@ div[data-testid="stHorizontalBlock"] button[kind="secondary"].game-cell {{
     opacity:.45;transition:opacity .12s!important;box-shadow:none!important;}}
 .delete-btn button:hover {{opacity:1!important;background:rgba(255,107,107,.15)!important;}}
 
-/* ── Land game grid buttons font size ── */
+/* Update these sections in your <style> block */
 button.game-cell, 
 div[data-testid="stHorizontalBlock"] button[kind="primary"],
 div[data-testid="stHorizontalBlock"] button[kind="secondary"].game-cell {{
-    font-size: 0.3rem !important;  /* adjust to whatever size you want */
-    min-height: 26px !important;  /* bigger buttons */
-    height: 26px !important;
-    line-height: 1.2 !important;
-    padding: 2px 1px !important;
+    font-size: 0.6rem !important; /* Slightly larger for readability */
+    min-height: 40px !important;  /* Taller to fit two lines of text */
+    height: auto !important;
+    line-height: 1.1 !important;
+    padding: 5px 2px !important;
+    white-space: pre-wrap !important; /* Allows the $cost and +inc to sit nicely */
 }}
 </style>
 """, unsafe_allow_html=True)
