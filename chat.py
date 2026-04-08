@@ -645,6 +645,9 @@ def render_land_game(me):
     action_taken = False
     
 # ── Grid ──────────────────────────────────────────────────────────────────
+board = st.session_state.land_board
+players = st.session_state.land_players
+
 for row in range(GRID_ROWS):
     cols_w = st.columns(GRID_COLS)
 
