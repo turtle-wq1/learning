@@ -995,25 +995,41 @@ st.markdown("""<style>
 button[title="View fullscreen"],[data-testid="StyledFullScreenButton"]{display:none!important;}
 </style>""", unsafe_allow_html=True)
 
-# 1. Update the local cash variable from the DB before rendering the UI
+# 1. Update the local cash variable from the DB
 my_cash = get_cash(me) 
 
 # 2. Render the Split Screen Layout
 game_col, chat_col = st.columns(2)
+
 with game_col:
+    # --- MANUAL REFRESH BUTTON WITH COOLDOWN ---
+    if "last_manual_earn" not in st.session_state:
+        st.session_state.last_manual_earn = 0
+    
+    elapsed = time.time() - st.session_state.last_manual_earn
+    cooldown = 3
+    
+    if elapsed < cooldown:
+        st.button(f"⏳ Cooling down ({int(cooldown - elapsed)}s)", disabled=True, use_container_width=True)
+    else:
+        if st.button("💰 Earn Cash (Manual Refresh)", use_container_width=True):
+            # This triggers the income collection and a refresh
+            collect_income(me, get_board())
+            st.session_state.last_manual_earn = time.time()
+            st.rerun()
+    
     render_land_game(me)
+
 with chat_col:
     render_chat_panel(me)
 
-# 3. Smooth Auto-Refresh Logic
-# This checks if 3 seconds have passed since the last rerun.
-# If so, it triggers a rerun to fetch new income/cash from the database.
+# 3. Smooth Auto-Refresh Logic (Background)
 if "last_refresh" not in st.session_state:
     st.session_state.last_refresh = time.time()
-
-# We use a small sleep to prevent the CPU from redlining during the check
-time.sleep(0.1) 
 
 if time.time() - st.session_state.last_refresh > 3:
     st.session_state.last_refresh = time.time()
     st.rerun()
+
+# Small sleep to keep the app responsive
+time.sleep(0.1)
