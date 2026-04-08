@@ -646,7 +646,13 @@ def render_land_game(me):
     
 # ── Grid ──────────────────────────────────────────────────────────────────
 if "land_board" not in st.session_state:
-    init_land_game()
+    st.session_state.land_board = [
+        {"owner": None, "color": None}
+        for _ in range(GRID_ROWS * GRID_COLS)
+    ]
+
+if "land_players" not in st.session_state:
+    st.session_state.land_players = {}
 
 board = st.session_state.land_board
 players = st.session_state.land_players
