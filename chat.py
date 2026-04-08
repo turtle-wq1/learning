@@ -867,21 +867,30 @@ def render_land_game(me):
 # CHAT PANEL HELPER
 # ══════════════════════════════════════════════════════════════════════════════
 def render_chat_panel(me):
+    # ... (Keep your existing header logic)
+
     active_dm = st.session_state.active_dm
+    
     if active_dm:
-        st.markdown(f'<div class="chat-header"><span class="chat-dm">⇄ DM</span> · {active_dm}</div>',
-                    unsafe_allow_html=True)
+        st.subheader(f"Direct Message: {active_dm}")
+        if st.button("⬅ Back to Global"):
+            st.session_state.active_dm = None
+            st.rerun()
         messages = get_dm_messages(me, active_dm)
     else:
-        st.markdown('<div class="chat-header"><span class="chat-channel">#</span> global</div>',
-                    unsafe_allow_html=True)
         messages = get_global_messages()
-    render_messages(messages, me)
-    placeholder_text = f"Message {active_dm}..." if active_dm else "Message #global..."
-    if prompt := st.chat_input(placeholder_text):
-        send_message(me, prompt, recipient=active_dm if active_dm else None)
-        st.rerun()
 
+    # Display messages
+    render_messages(messages, me)
+
+    # THE FIX: Put the input inside the panel and handle the logic
+    placeholder = f"Message {active_dm}..." if active_dm else "Message #global..."
+    
+    # We use a unique key for the chat input based on the active_dm 
+    # to force it to clear when switching rooms
+    if prompt := st.chat_input(placeholder, key=f"chat_input_{active_dm}"):
+        send_message(me, prompt, active_dm)
+        st.rerun()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SESSION STATE INIT
