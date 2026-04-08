@@ -22,13 +22,24 @@ RESET_VOTE_THRESHOLD = 0.75
 
 # ─── Cell cost / income helpers ───────────────────────────────────────────────
 def cell_cost(row, col):
-    """Cost increases toward the centre. Outer edge = $5, dead-centre ~$80."""
+    """Cost increases toward the centre. Edge is $25, Center is $400 (16x)."""
+    edge_price = 25
+    center_price = 400
+    price_range = center_price - edge_price # This is 375
+    
     cx = (GRID_COLS - 1) / 2
     cy = (GRID_ROWS - 1) / 2
     dist = math.sqrt((col - cx) ** 2 + (row - cy) ** 2)
     max_dist = math.sqrt(cx ** 2 + cy ** 2)
-    norm = dist / max_dist          # 1 at corner, 0 at centre
-    return max(5, round((1 - norm) * 75 + 5) * 5)
+    
+    # norm is 1 at corners (furthest) and 0 at center
+    norm = dist / max_dist          
+    
+    # (1 - norm) makes it 1 at center and 0 at corners
+    # We multiply the range by the center-closeness and add the base price
+    cost = round((1 - norm) * price_range + edge_price)
+    
+    return max(edge_price, cost)
 
 def cell_income(row, col):
     """Income per tick ~10% of cost, min $1."""
@@ -529,12 +540,14 @@ def fmt_time(ts):
     return time.strftime("%I:%M %p", time.localtime(ts)).lstrip("0")
 
 def cost_color(cost):
-    """Green (cheap) → yellow → red (expensive centre)."""
-    norm = min(1.0, (cost - 5) / 75)
+    """Update this to match your new $25 to $400 scale."""
+    # norm = (Current - Min) / (Max - Min)
+    norm = min(1.0, (cost - 25) / (400 - 25))
+    
     r = int(norm * 200)
     g = int((1 - norm) * 160)
     return f"rgb({r},{g},30)"
-
+    
 REACTION_EMOJIS = ["❤️","😂","👍","🔥","😮","😢","🎉","💀"]
 
 def render_messages(messages, me):
