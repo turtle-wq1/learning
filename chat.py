@@ -657,6 +657,12 @@ if "land_players" not in st.session_state:
 board = st.session_state.land_board
 players = st.session_state.land_players
 
+me = st.session_state.land_me
+my_cash = players[me]["cash"]
+my_color = players[me]["color"]
+
+owned_any = any(c["owner"] == me for c in board)
+
 for row in range(GRID_ROWS):
     cols_w = st.columns(GRID_COLS)
 
